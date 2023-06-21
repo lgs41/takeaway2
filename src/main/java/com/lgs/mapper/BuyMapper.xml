@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- mybatis 框架头文件声明，类似spring环境，均需要加入头文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.BuyMapper">
+
+<!--    展示购物车-->
+    <select id="getBuyList"  parameterType="com.lgs.query.FoodQuery" resultType="buy">
+        select tb_buy.id,tb_food.food_pri,tb_food.food_name,tb_food.food_price,tb_food_class.class_name,tb_buy.add_data from tb_food
+        join tb_buy
+        on tb_buy.food_id=tb_food.id
+        join tb_food_class
+        on tb_food.food_class_id=tb_food_class.id
+        <where>
+               and user_id=#{userId}
+            <if test="test.foodName!=null and test.foodName!=''">
+                and food_name like concat('%',#{test.foodName},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--    批量删除-->
+    <delete id="toDelBatch">
+        delete from tb_buy where id in
+        <foreach collection="array" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </delete>
+
+    <select id="getPrice"  resultType="food">
+        select tb_food.* from tb_buy
+           join tb_food
+        on tb_food.id=tb_buy.food_id
+        where tb_buy.id=#{buyId}
+    </select>
+
+    <insert id="toAddBatch">
+        insert into tb_order(user_id,food_name,number,price,order_data) value (#{userId},#{foodName},#{number},#{price},NOW())
+    </insert>
+
+<!--    修改销量-->
+    <update id="updateSale" parameterType="food">
+        update tb_food set food_sale=#{foodSale} where id=#{id}
+    </update>
+</mapper>

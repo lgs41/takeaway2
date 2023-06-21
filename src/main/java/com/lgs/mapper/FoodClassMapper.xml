@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- mybatis 框架头文件声明，类似spring环境，均需要加入头文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.FoodClassMapper">
+
+<!--    展示-->
+    <select id="getFoodClassList" parameterType="com.lgs.query.FoodClassQuery" resultType="foodClass">
+        select * from tb_food_class
+        <where>
+            <if test="className!=null and className!=''">
+                and class_name like concat('%',#{className},'%')
+            </if>
+        </where>
+    </select>
+
+<!--    判断商品分类名称是否存在-->
+    <select id="getByClassName" resultType="foodClass">
+        select * from tb_food_class where class_name=#{className}
+    </select>
+
+<!--    添加商品名称-->
+    <insert id="insert">
+        insert into tb_food_class(class_name) value (#{className})
+    </insert>
+
+<!--    删除商品分类-->
+    <delete id="deleteFoodClass">
+        delete from tb_food_class where id=#{id}
+    </delete>
+
+<!--    商品分类批量删除-->
+    <delete id="delBatch">
+        delete from tb_food_class where id in
+        <foreach collection="array" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </delete>
+
+<!--    回显商品分类名称-->
+    <select id="getById" resultType="foodClass">
+        select * from tb_food_class where id=#{id}
+    </select>
+
+<!--    修改商品分类名称-->
+    <update id="update" parameterType="foodClass">
+        update tb_food_class set class_name=#{className} where id=#{id}
+    </update>
+
+</mapper>

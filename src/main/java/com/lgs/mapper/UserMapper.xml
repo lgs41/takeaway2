@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- mybatis 框架头文件声明，类似spring环境，均需要加入头文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.UserMapper">
+<!--    登录-->
+    <select id="login" resultType="user">
+        select id,user_name from tb_user where user_name=#{userName} and user_pwd=#{userPwd}
+    </select>
+<!--    判断该用户名是否已经注册-->
+    <select id="getByName" resultType="user">
+        select * from tb_user where user_name=#{userName}
+    </select>
+<!--    注册插入数据-->
+    <insert id="insert1">
+        insert into tb_user(gender,user_name,user_pwd,user_phone,user_add,role_id) value (#{gender},#{userName},#{userPwd},#{userPhone},#{userAdd},2)
+    </insert>
+
+    <!--展示及模糊查询-->
+    <select id="getUserList"  parameterType="com.lgs.query.UserQuery" resultType="user">
+        SELECT
+        tb_user.id,gender,user_name,user_pwd,user_phone,user_add,role_name as roleName FROM tb_user
+        JOIN tb_role ON tb_role.id = tb_user.role_id
+        <where>
+            <if test="userName!=null and userName!=''">
+                and user_name like concat('%',#{userName},'%')
+            </if>
+        </where>
+    </select>
+<!--    添加用户插入数据-->
+    <insert id="insert">
+        insert into tb_user(gender,user_name,user_pwd,user_phone,user_add,role_id) value (#{gender},#{userName},#{userPwd},#{userPhone},#{userAdd},#{roleId})
+    </insert>
+    <!--    修改用户-->
+    <update id="update" parameterType="user">
+        update tb_user set user_name=#{userName},user_pwd=#{userPwd},user_phone=#{userPhone},user_add=#{userAdd},role_id=#{roleId} where id=#{id}
+    </update>
+<!--    删除用户-->
+    <delete id="deleteUser">
+        delete from tb_user where id=#{id}
+    </delete>
+<!--    批量删除-->
+    <delete id="delBatch">
+        delete from tb_user where id in
+        <foreach collection="array" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </delete>
+<!--    查询角色名-->
+    <select id="getRoleList" resultType="role">
+        select * from tb_role
+    </select>
+    <!--查询角色-->
+    <select id="getById" resultType="user">
+        select * from tb_user where id=#{id}
+    </select>
+
+
+</mapper>

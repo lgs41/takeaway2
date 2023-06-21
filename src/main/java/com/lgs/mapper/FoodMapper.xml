@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- mybatis 框架头文件声明，类似spring环境，均需要加入头文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.FoodMapper">
+
+    <!--展示及模糊查询-->
+    <select id="getFoodList"  parameterType="com.lgs.query.FoodQuery" resultType="food">
+        SELECT
+        tb_food.id,
+        tb_food.food_pri,
+        tb_food.food_name,
+        tb_food.food_price,
+        tb_food.food_sale,
+        tb_food.food_describe,
+        tb_food_class.class_name
+        FROM
+        tb_food
+        JOIN tb_food_class ON tb_food_class.id = tb_food.food_class_id
+        <where>
+            <if test="foodName!=null and foodName!=''">
+                and food_name like concat('%',#{foodName},'%')
+            </if>
+        </where>
+    </select>
+
+<!--    通过商品的分类名称在数据库中插入id-->
+    <select id="getFoodClassId" resultType="foodClass">
+        select * from tb_food_class where class_name=#{className}
+    </select>
+
+<!--    判断商品是否存在-->
+    <select id="getByName" resultType="food">
+        select * from tb_food where food_name=#{foodName}
+    </select>
+
+    <!--    判断商品是否存在-->
+    <select id="getById" resultType="food">
+        select * from tb_food
+        join tb_food_class
+        on tb_food_class.id=tb_food.food_class_id
+            where tb_food.id=#{id}
+    </select>
+
+<!--    添加商品-->
+    <insert id="insert">
+        insert into tb_food(food_pri,food_name,food_price,food_describe,food_class_id)
+           value (#{foodPri},#{foodName},#{foodPrice},#{foodDescribe},#{foodClassId})
+    </insert>
+
+<!--    课程批量删除-->
+    <delete id="toFoodDelBatch">
+        delete from tb_food where id in
+        <foreach collection="array" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </delete>
+
+<!--    未修改照片时修改商品信息-->
+    <update id="update" parameterType="food">
+        update tb_food set food_name=#{foodName},food_price=#{foodPrice},food_describe=#{foodDescribe},food_class_id=#{foodClassId}
+             where id=#{id}
+    </update>
+
+<!--    修改图片-->
+    <update id="update1" parameterType="food">
+        update tb_food set food_pri=#{foodPri},food_name=#{foodName},food_price=#{foodPrice},food_describe=#{foodDescribe},food_class_id=#{foodClassId}
+        where id=#{id}
+    </update>
+
+</mapper>

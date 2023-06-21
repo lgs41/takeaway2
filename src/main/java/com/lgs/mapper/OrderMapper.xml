@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- mybatis 框架头文件声明，类似spring环境，均需要加入头文件 -->
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lgs.mapper.OrderMapper">
+<!--    展示订单-->
+    <select id="getOrderList"  parameterType="com.lgs.query.OrderQuery" resultType="order">
+        select tb_order.id as orderId,tb_user.user_name,tb_user.user_phone,tb_user.user_add,tb_order.food_name,tb_order.number,
+        tb_order.price,tb_order.order_data,tb_order.state
+        from tb_order
+        join tb_user
+        on tb_user.id=tb_order.user_id
+        <where>
+            <if test="foodName!=null and foodName!=''">
+                and food_name like concat('%',#{foodName},'%')
+            </if>
+        </where>
+    </select>
+
+    <!--    展示用户订单-->
+    <select id="getUserOrderList"  parameterType="com.lgs.query.OrderQuery" resultType="order">
+        select tb_order.id as orderId,tb_user.user_name,tb_user.user_phone,tb_user.user_add,tb_order.food_name,tb_order.number,
+        tb_order.price,tb_order.order_data,tb_order.state
+        from tb_order
+        join tb_user
+        on tb_user.id=tb_order.user_id
+        <where>
+                and tb_order.user_id=#{userId}
+            <if test="test.foodName!=null and test.foodName!=''">
+                and food_name like concat('%',#{test.foodName},'%')
+            </if>
+        </where>
+    </select>
+
+<!--    修改订单状态-->
+    <update id="toFoodEdit" parameterType="order">
+        update tb_order set state='已送达'
+        where id=#{orderId}
+    </update>
+<!--    已评价-->
+    <update id="toEdit" parameterType="order">
+        update tb_order set state='已评价'
+        where id=#{orderId}
+    </update>
+    <!--    批量删除订单-->
+    <delete id="toDelBatch">
+        delete from tb_order where id in
+        <foreach collection="array" open="(" separator="," close=")" item="temp">
+            #{temp}
+        </foreach>
+    </delete>
+<!--    查看订单-->
+    <select id="getOrderIdList" resultType="order">
+        select tb_order.id as orderId,tb_user.user_name,tb_user.user_phone,tb_user.user_add,tb_order.food_name,tb_order.number,
+        tb_order.price,tb_order.order_data,tb_order.state
+        from tb_order
+        join tb_user
+        on tb_user.id=tb_order.user_id
+        where id=#{orderId}
+    </select>
+<!--    查看订单-->
+    <select id="getList" resultType="review">
+        select user_id,id as order_id from tb_order where id=#{orderId}
+    </select>
+<!--    订单评论-->
+    <insert id="toReview">
+        insert into tb_review(user_id,order_id,review,review_data)
+            value (#{userId},#{orderId},#{review},NOW())
+    </insert>
+
+    <select id="getIdList" resultType="order">
+        select user_id from tb_order where id=#{orderId}
+    </select>
+
+</mapper>
